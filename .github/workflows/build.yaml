@@ -1,0 +1,118 @@
+name: Build r8125 kernel module
+
+# on:
+#   schedule:
+#     - cron:  '*/6 * * * *'
+
+# on: [push, pull_request]
+on:
+  push:
+    branches:
+      - 'main'
+
+env:
+  DRIVER_VERSION: 9.006.04
+  APT_URL: https://gist.githubusercontent.com/csrutil/6d83b7dd62b5652697fe22271fbee482/raw/5149abcc3ca3ee48f95978949db528d6bf765daa/depends-ubuntu-2004
+
+jobs:
+  build_Modules:
+    runs-on: ubuntu-20.04
+
+    strategy:
+      fail-fast: false
+      matrix:
+        sdk_url:
+          - https://downloads.openwrt.org/releases/21.02.0/targets/x86/64/openwrt-sdk-21.02.0-x86-64_gcc-8.4.0_musl.Linux-x86_64.tar.xz
+          - https://downloads.openwrt.org/releases/21.02.0/targets/x86/generic/openwrt-sdk-21.02.0-x86-generic_gcc-8.4.0_musl.Linux-x86_64.tar.xz
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@main
+
+    - name: Initialization Environment
+      env:
+        DEBIAN_FRONTEND: noninteractive
+      run: |
+        sudo rm -rf /etc/apt/sources.list.d/* /usr/share/dotnet /usr/local/lib/android /opt/ghc
+        sudo -E apt-get -qq update
+        sudo -E apt-get -qq install $(curl -fsSL $APT_URL) tree
+        sudo -E apt-get -qq autoremove --purge
+        sudo -E apt-get -qq clean
+
+    - name: Download SDK
+      run: |
+        url=${{ matrix.sdk_url }}
+        sdk=$(basename $url | awk -F '.tar.xz' '{ print $1 }')
+
+        wget $url
+        tar xvf $sdk.tar.xz
+
+        mkdir $sdk/package/r8125
+        cp Makefile $sdk/package/r8125
+        cp -r src $sdk/package/r8125
+
+    - name: Compile
+      run: |
+        url=${{ matrix.sdk_url }}
+        sdk=$(basename $url | awk -F '.tar.xz' '{ print $1 }')
+
+        cd $sdk
+        echo 'CONFIG_PACKAGE_kmod-r8125=m' > .config
+        make defconfig
+        make package/r8125/compile -j$(nproc) || make package/r8125/compile -j1 V=sc
+
+        # cp file to artifact
+        cd ${{ github.workspace }}
+        mkdir -p ${{ github.workspace }}/artifact
+        for ipk in `find . -name '*.ipk'`; do
+          cp $ipk ${{ github.workspace }}/artifact/
+        done
+
+    - name: Upload build artifacts
+      uses: actions/upload-artifact@v2
+      with:
+        name: ${{ env.DRIVER_VERSION }}
+        path: ${{ github.workspace }}/artifact/**/*
+
+  deploy:
+    needs: [build_Modules]
+    name: Create release and upload artifacts
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Download build artifacts
+      uses: actions/download-artifact@v2
+      with:
+        name: ${{ env.DRIVER_VERSION }}
+
+    - name: Upload build artifacts to cloud
+      run: |
+        mkdir -p ${{ github.workspace }}/artifact
+        for ipk in `find . -name '*.ipk'`; do
+          mv $ipk ${{ github.workspace }}/artifact
+        done
+
+        md5sum artifact/*.ipk > release.txt
+
+    - name: Upload firmware to release
+      uses: softprops/action-gh-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.ACTION_GITHUB_TOKEN }}
+      with:
+        name: ${{ env.DRIVER_VERSION }}
+        tag_name: ${{ env.DRIVER_VERSION }}
+        body_path: release.txt
+        files: artifact/**/*
+
+    - name: Remove old Releases
+      uses: dev-drprasad/delete-older-releases@v0.2.0
+      with:
+        keep_latest: 2
+        delete_tags: true
+      env:
+        GITHUB_TOKEN: ${{ secrets.ACTION_GITHUB_TOKEN }}
+
+    - name: Delete Artifacts
+      uses: geekyeggo/delete-artifact@v1
+      with:
+        name: ${{ env.DRIVER_VERSION }}
