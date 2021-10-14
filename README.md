@@ -44,4 +44,15 @@ root@OpenWrt:~# dmesg | grep r8125
 [    7.185940] r8125  Copyright (C) 2021  Realtek NIC software team <nicfae@realtek.com>
 [   13.320417] r8125: eth0: link up
 [   13.640444] r8125: eth1: link up
+root@OpenWrt:~# speedtest
+
+   Speedtest by Ookla
+
+     Server: China Telecom ZheJiang Branch - Hangzhou (id = 7509)
+        ISP: China Mobile Guangdong
+    Latency:    22.62 ms   (0.06 ms jitter)
+   Download:   944.39 Mbps (data used: 1.2 GB)
+     Upload:   117.18 Mbps (data used: 208.7 MB)
+Packet Loss:     0.0%
+ Result URL: https://www.speedtest.net/result/c/e3e341ff-6215-4b2c-b439-71b2ce35dd6b
 ```
