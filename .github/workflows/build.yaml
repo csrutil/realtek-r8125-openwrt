@@ -11,7 +11,7 @@ on:
       - 'main'
 
 env:
-  DRIVER_VERSION: 9.006.04
+  KMOD_VERSION: 9.006.04
   APT_URL: https://gist.githubusercontent.com/csrutil/6d83b7dd62b5652697fe22271fbee482/raw/5149abcc3ca3ee48f95978949db528d6bf765daa/depends-ubuntu-2004
 
 jobs:
@@ -23,7 +23,9 @@ jobs:
       matrix:
         sdk_url:
           - https://downloads.openwrt.org/releases/21.02.0/targets/x86/64/openwrt-sdk-21.02.0-x86-64_gcc-8.4.0_musl.Linux-x86_64.tar.xz
+          - https://downloads.openwrt.org/releases/21.02.1/targets/x86/64/openwrt-sdk-21.02.1-x86-64_gcc-8.4.0_musl.Linux-x86_64.tar.xz
           - https://downloads.openwrt.org/releases/21.02.0/targets/x86/generic/openwrt-sdk-21.02.0-x86-generic_gcc-8.4.0_musl.Linux-x86_64.tar.xz
+          - https://downloads.openwrt.org/releases/21.02.1/targets/x86/generic/openwrt-sdk-21.02.1-x86-generic_gcc-8.4.0_musl.Linux-x86_64.tar.xz
 
     steps:
     - name: Checkout
@@ -71,7 +73,7 @@ jobs:
     - name: Upload build artifacts
       uses: actions/upload-artifact@v2
       with:
-        name: ${{ env.DRIVER_VERSION }}
+        name: ${{ env.KMOD_VERSION }}
         path: ${{ github.workspace }}/artifact/**/*
 
   deploy:
@@ -83,7 +85,7 @@ jobs:
     - name: Download build artifacts
       uses: actions/download-artifact@v2
       with:
-        name: ${{ env.DRIVER_VERSION }}
+        name: ${{ env.KMOD_VERSION }}
 
     - name: Upload build artifacts to cloud
       run: |
@@ -99,8 +101,8 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.ACTION_GITHUB_TOKEN }}
       with:
-        name: ${{ env.DRIVER_VERSION }}
-        tag_name: ${{ env.DRIVER_VERSION }}
+        name: ${{ env.KMOD_VERSION }}
+        tag_name: ${{ env.KMOD_VERSION }}
         body_path: release.txt
         files: artifact/**/*
 
@@ -115,4 +117,4 @@ jobs:
     - name: Delete Artifacts
       uses: geekyeggo/delete-artifact@v1
       with:
-        name: ${{ env.DRIVER_VERSION }}
+        name: ${{ env.KMOD_VERSION }}
