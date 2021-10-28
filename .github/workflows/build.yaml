@@ -22,6 +22,8 @@ jobs:
       fail-fast: false
       matrix:
         sdk_url:
+          - https://downloads.openwrt.org/releases/19.07.8/targets/x86/generic/openwrt-sdk-19.07.8-x86-generic_gcc-7.5.0_musl.Linux-x86_64.tar.xz
+          - https://downloads.openwrt.org/releases/19.07.8/targets/x86/64/openwrt-sdk-19.07.8-x86-64_gcc-7.5.0_musl.Linux-x86_64.tar.xz
           - https://downloads.openwrt.org/releases/21.02.0/targets/x86/64/openwrt-sdk-21.02.0-x86-64_gcc-8.4.0_musl.Linux-x86_64.tar.xz
           - https://downloads.openwrt.org/releases/21.02.1/targets/x86/64/openwrt-sdk-21.02.1-x86-64_gcc-8.4.0_musl.Linux-x86_64.tar.xz
           - https://downloads.openwrt.org/releases/21.02.0/targets/x86/generic/openwrt-sdk-21.02.0-x86-generic_gcc-8.4.0_musl.Linux-x86_64.tar.xz
@@ -95,6 +97,7 @@ jobs:
         done
 
         md5sum artifact/*.ipk > release.txt
+        echo "Please check the stock releases at https://downloads.openwrt.org/releases/" >> release.txt
 
     - name: Upload firmware to release
       uses: softprops/action-gh-release@v1
