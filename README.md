@@ -18,41 +18,31 @@ The modules are compiled by stock sdk, if you have self compiled firmware, it's 
 ## On my router
 
 ```bash
-BusyBox v1.33.1 (2021-09-13 16:49:38 UTC) built-in shell (ash)
-
-  _______                     ________        __
- |       |.-----.-----.-----.|  |  |  |.----.|  |_
- |   -   ||  _  |  -__|     ||  |  |  ||   _||   _|
- |_______||   __|_____|__|__||________||__|  |____|
-          |__| W I R E L E S S   F R E E D O M
- -----------------------------------------------------
- OpenWrt 21.02.0, r16279-5cc0535800
- -----------------------------------------------------
 root@OpenWrt:~# modinfo r8125
-module:   /lib/modules/5.4.143/r8125.ko
-license:  GPL
+module:		/lib/modules/5.4.154/r8125.ko
+license:	GPL
 depends:
-retpoline:  Y
-name:   r8125
-vermagic: 5.4.143 SMP mod_unload
+retpoline:	Y
+name:		r8125
+vermagic:	5.4.154 SMP mod_unload
 root@OpenWrt:~# dmesg | grep r8125
-[    7.055225] r8125 2.5Gigabit Ethernet driver 9.006.04-NAPI-RSS loaded
-[    7.112709] r8125: This product is covered by one or more of the following patents: US6,570,884, US6,115,776, and US6,327,625.
-[    7.117808] r8125  Copyright (C) 2021  Realtek NIC software team <nicfae@realtek.com>
-[    7.124716] r8125 2.5Gigabit Ethernet driver 9.006.04-NAPI-RSS loaded
-[    7.180727] r8125: This product is covered by one or more of the following patents: US6,570,884, US6,115,776, and US6,327,625.
-[    7.185940] r8125  Copyright (C) 2021  Realtek NIC software team <nicfae@realtek.com>
-[   13.320417] r8125: eth0: link up
-[   13.640444] r8125: eth1: link up
+[    7.119890] r8125 2.5Gigabit Ethernet driver 9.006.04-NAPI-RSS loaded
+[    7.177030] r8125: This product is covered by one or more of the following patents: US6,570,884, US6,115,776, and US6,327,625.
+[    7.182093] r8125  Copyright (C) 2021  Realtek NIC software team <nicfae@realtek.com>
+[    7.189126] r8125 2.5Gigabit Ethernet driver 9.006.04-NAPI-RSS loaded
+[    7.245019] r8125: This product is covered by one or more of the following patents: US6,570,884, US6,115,776, and US6,327,625.
+[    7.250329] r8125  Copyright (C) 2021  Realtek NIC software team <nicfae@realtek.com>
+[   13.384830] r8125: eth0: link up
+[   13.640644] r8125: eth1: link up
 root@OpenWrt:~# speedtest
 
    Speedtest by Ookla
 
-     Server: China Telecom ZheJiang Branch - Hangzhou (id = 7509)
-        ISP: China Mobile Guangdong
-    Latency:    22.62 ms   (0.06 ms jitter)
-   Download:   944.39 Mbps (data used: 1.2 GB)
-     Upload:   117.18 Mbps (data used: 208.7 MB)
+     Server: IdeaTek Telcom - Hutchinson, KS (id = 20794)
+        ISP: Stacks-inc-01
+    Latency:   227.98 ms   (0.15 ms jitter)
+   Download:   912.37 Mbps (data used: 1.3 GB)
+     Upload:   113.22 Mbps (data used: 146.1 MB)
 Packet Loss:     0.0%
- Result URL: https://www.speedtest.net/result/c/e3e341ff-6215-4b2c-b439-71b2ce35dd6b
-```
+ Result URL: https://www.speedtest.net/result/c/c808d0ee-2735-4e42-bb02-5a353ce913bd
+ ```
