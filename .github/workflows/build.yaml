@@ -70,8 +70,13 @@ jobs:
         # cp file to artifact
         cd ${{ github.workspace }}
         mkdir -p ${{ github.workspace }}/artifact
-        for ipk in `find . -name '*.ipk'`; do
-          cp $ipk ${{ github.workspace }}/artifact/
+
+        for ipk in `find . -name 'kmod-r8125*.ipk'`; do
+          cp $ipk ${{ github.workspace }}/artifact
+        done
+
+        for ipk in `find . -name 'kmod-igb-intel*.ipk'`; do
+          cp $ipk ${{ github.workspace }}/artifact
         done
 
     - name: Upload build artifacts
@@ -94,14 +99,9 @@ jobs:
     - name: Upload build artifacts to cloud
       run: |
         mkdir -p ${{ github.workspace }}/artifact
-        for ipk in `find . -name 'kmod-r8125*.ipk'`; do
+        for ipk in `find . -name '*.ipk'`; do
           mv $ipk ${{ github.workspace }}/artifact
         done
-
-        for ipk in `find . -name 'kmod-igb-intel*.ipk'`; do
-          mv $ipk ${{ github.workspace }}/artifact
-        done
-
         cd artifact && md5sum *.ipk > md5sum.txt
         cd ..
 
