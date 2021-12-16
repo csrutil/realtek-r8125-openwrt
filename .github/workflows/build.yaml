@@ -51,7 +51,7 @@ jobs:
         wget $url
         tar xvf $sdk.tar.xz
 
-        mkdir $sdk/package
+        mkdir -p $sdk/package
         cp -r drivers/* $sdk/package/
 
     - name: Compile
