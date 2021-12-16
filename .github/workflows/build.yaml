@@ -1,4 +1,4 @@
-name: Build OpenWrt drivers
+name: Build OpenWrt ethernet drivers
 
 # on:
 #   schedule:
@@ -98,9 +98,10 @@ jobs:
           mv $ipk ${{ github.workspace }}/artifact
         done
 
-        md5sum artifact/*.ipk > release.txt
-        echo "Please check the stock releases at https://downloads.openwrt.org/releases/" >> release.txt
+        cd artifact && md5sum *.ipk > md5sum.txt
+        cd ..
 
+        echo "Please check the stock releases at https://downloads.openwrt.org/releases/" >> release.txt
     - name: Upload firmware to release
       uses: softprops/action-gh-release@v1
       env:
