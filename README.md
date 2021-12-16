@@ -1,7 +1,8 @@
-# r8125
-realtek 2.5G ethernet driver for OpenWrt X64
+# OpenWrtDrivers
 
-[![Build r8125 kernel module](https://github.com/csrutil/r8125/actions/workflows/build.yaml/badge.svg)](https://github.com/csrutil/r8125/actions/workflows/build.yaml)
+realtek 2.5G ethernet driver for OpenWrt X64 / latest intel igb driver
+
+[![Build r8125 kernel module](https://github.com/csrutil/OpenWrtDrivers/actions/workflows/build.yaml/badge.svg)](https://github.com/csrutil/OpenWrtDrivers/actions/workflows/build.yaml)
 
 ## How to use it
 

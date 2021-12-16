@@ -1,4 +1,4 @@
-name: Build r8125 kernel module
+name: Build OpenWrt drivers
 
 # on:
 #   schedule:
@@ -51,9 +51,8 @@ jobs:
         wget $url
         tar xvf $sdk.tar.xz
 
-        mkdir $sdk/package/r8125
-        cp Makefile $sdk/package/r8125
-        cp -r src $sdk/package/r8125
+        mkdir $sdk/package
+        cp -r drivers/* $sdk/package/
 
     - name: Compile
       run: |
@@ -62,8 +61,11 @@ jobs:
 
         cd $sdk
         echo 'CONFIG_PACKAGE_kmod-r8125=m' > .config
+        echo 'CONFIG_PACKAGE_kmod-igb-intel=m' >> .config
         make defconfig
+        
         make package/r8125/compile -j$(nproc) || make package/r8125/compile -j1 V=sc
+        make package/kmod-igb-intel/compile -j$(nproc) || make package/kmod-igb-intel/compile -j1 V=sc
 
         # cp file to artifact
         cd ${{ github.workspace }}
