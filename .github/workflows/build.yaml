@@ -34,6 +34,8 @@ jobs:
           - https://downloads.openwrt.org/releases/21.02.1/targets/x86/generic/openwrt-sdk-21.02.1-x86-generic_gcc-8.4.0_musl.Linux-x86_64.tar.xz
           - https://downloads.openwrt.org/releases/21.02.2/targets/x86/64/openwrt-sdk-21.02.2-x86-64_gcc-8.4.0_musl.Linux-x86_64.tar.xz
           - https://downloads.openwrt.org/releases/21.02.2/targets/x86/generic/openwrt-sdk-21.02.2-x86-generic_gcc-8.4.0_musl.Linux-x86_64.tar.xz
+          - https://downloads.openwrt.org/releases/22.03.0-rc1/targets/x86/64/openwrt-sdk-22.03.0-rc1-x86-64_gcc-11.2.0_musl.Linux-x86_64.tar.xz
+          - https://downloads.openwrt.org/releases/22.03.0-rc1/targets/x86/generic/openwrt-sdk-22.03.0-rc1-x86-generic_gcc-11.2.0_musl.Linux-x86_64.tar.xz
 
 
     steps:
