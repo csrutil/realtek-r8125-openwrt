@@ -26,14 +26,10 @@ jobs:
       fail-fast: false
       matrix:
         sdk_url:
-          - https://downloads.openwrt.org/releases/19.07.8/targets/x86/generic/openwrt-sdk-19.07.8-x86-generic_gcc-7.5.0_musl.Linux-x86_64.tar.xz
-          - https://downloads.openwrt.org/releases/19.07.8/targets/x86/64/openwrt-sdk-19.07.8-x86-64_gcc-7.5.0_musl.Linux-x86_64.tar.xz
-          - https://downloads.openwrt.org/releases/21.02.0/targets/x86/64/openwrt-sdk-21.02.0-x86-64_gcc-8.4.0_musl.Linux-x86_64.tar.xz
-          - https://downloads.openwrt.org/releases/21.02.0/targets/x86/generic/openwrt-sdk-21.02.0-x86-generic_gcc-8.4.0_musl.Linux-x86_64.tar.xz
-          - https://downloads.openwrt.org/releases/21.02.1/targets/x86/64/openwrt-sdk-21.02.1-x86-64_gcc-8.4.0_musl.Linux-x86_64.tar.xz
-          - https://downloads.openwrt.org/releases/21.02.1/targets/x86/generic/openwrt-sdk-21.02.1-x86-generic_gcc-8.4.0_musl.Linux-x86_64.tar.xz
-          - https://downloads.openwrt.org/releases/21.02.2/targets/x86/64/openwrt-sdk-21.02.2-x86-64_gcc-8.4.0_musl.Linux-x86_64.tar.xz
-          - https://downloads.openwrt.org/releases/21.02.2/targets/x86/generic/openwrt-sdk-21.02.2-x86-generic_gcc-8.4.0_musl.Linux-x86_64.tar.xz
+          - https://downloads.openwrt.org/releases/19.07.9/targets/x86/generic/openwrt-sdk-19.07.9-x86-generic_gcc-7.5.0_musl.Linux-x86_64.tar.xz
+          - https://downloads.openwrt.org/releases/19.07.9/targets/x86/64/openwrt-sdk-19.07.9-x86-64_gcc-7.5.0_musl.Linux-x86_64.tar.xz
+          - https://downloads.openwrt.org/releases/21.02.3/targets/x86/64/openwrt-sdk-21.02.3-x86-64_gcc-8.4.0_musl.Linux-x86_64.tar.xz
+          - https://downloads.openwrt.org/releases/21.02.3/targets/x86/generic/openwrt-sdk-21.02.3-x86-generic_gcc-8.4.0_musl.Linux-x86_64.tar.xz
           - https://downloads.openwrt.org/releases/22.03.0-rc1/targets/x86/64/openwrt-sdk-22.03.0-rc1-x86-64_gcc-11.2.0_musl.Linux-x86_64.tar.xz
           - https://downloads.openwrt.org/releases/22.03.0-rc1/targets/x86/generic/openwrt-sdk-22.03.0-rc1-x86-generic_gcc-11.2.0_musl.Linux-x86_64.tar.xz
 
