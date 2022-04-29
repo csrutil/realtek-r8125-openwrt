@@ -7,7 +7,7 @@ on:
       - 'main'
 
 env:
-  KMOD_VERSION: 9.008.00x5.9.3
+  KMOD_VERSION: 9.009.00x5.9.3
   APT_URL: https://gist.githubusercontent.com/csrutil/6d83b7dd62b5652697fe22271fbee482/raw/5149abcc3ca3ee48f95978949db528d6bf765daa/depends-ubuntu-2004
 
 jobs:
