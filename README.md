@@ -56,7 +56,7 @@ CONFIG_ASPM = n
 - I210-based adapters: 4 queues
 - I211-based adapters: 2 queues
 
-If you have a OpenWrt on a VM(ESXI or PVE) that has I211 nics, just set two cores on it, and enable `RSS=2`. that's it!
+If you have an OpenWrt on a VM(ESXI or PVE) that has I211 nics, just set two cores on it, and enable `RSS=2`. that's it!
 
 ```bash
 # set RSS to 2 on OpenWrt
