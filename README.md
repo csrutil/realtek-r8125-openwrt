@@ -59,9 +59,9 @@ CONFIG_ASPM = n
 If you have an OpenWrt on a VM(ESXI or PVE) that has I211 nics, just set two cores on it, and enable `RSS=2`. that's it!
 
 ```bash
-# set RSS to 2 on OpenWrt
+# set RSS to 2 on OpenWrt for two nics
 root@main:~# cat /etc/modules.d/35-igb-intel
-igb RSS=2
+igb RSS=2,2
 ```
 
 ## How to use it
