@@ -109,7 +109,7 @@ jobs:
         cd ..
 
         wget -O release.txt $RELEASE_URL
-        echo "Updated at $(date)" >> release.txt
+        echo -e "\nUpdated at $(date)" >> release.txt
 
     - name: Upload firmware to release
       uses: softprops/action-gh-release@v1
