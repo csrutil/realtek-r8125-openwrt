@@ -82,3 +82,4 @@ Those packages are ONLY for the official stock firmwares
 - https://sourceforge.net/projects/e1000/files/igb%20stable/
 - https://www.realtek.com/zh/component/zoo/category/network-interface-controllers-10-100-1000m-gigabit-ethernet-pci-express-software
 - https://www.realtek.com/en/products/communications-network-ics/item/rtl8125bg-s-cg
+- https://www.realtek.com/en/component/zoo/category/network-interface-controllers-10-100-1000m-gigabit-ethernet-usb-3-0-software
