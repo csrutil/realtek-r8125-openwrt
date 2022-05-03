@@ -61,9 +61,9 @@ jobs:
         echo 'CONFIG_PACKAGE_kmod-igb-intel=m' >> .config
         make defconfig
         
-        make package/r8125/compile -j$(nproc) || make package/r8125/compile -j1 V=sc
-        make package/r8152/compile -j$(nproc) || make package/r8152/compile -j1 V=sc
-        make package/kmod-igb-intel/compile -j$(nproc) || make package/kmod-igb-intel/compile -j1 V=sc
+        make package/r8125/compile -j$(nproc) || make package/r8125/compile -j1 V=sc || exit 0
+        make package/r8152/compile -j$(nproc) || make package/r8152/compile -j1 V=sc || exit 0
+        make package/kmod-igb-intel/compile -j$(nproc) || make package/kmod-igb-intel/compile -j1 V=sc || exit 0
 
         # cp file to artifact
         cd ${{ github.workspace }}
