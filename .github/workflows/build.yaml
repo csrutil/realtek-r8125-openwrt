@@ -21,7 +21,7 @@ jobs:
         sdk_url:
           - https://downloads.openwrt.org/releases/19.07.10/targets/x86/64/openwrt-sdk-19.07.10-x86-64_gcc-7.5.0_musl.Linux-x86_64.tar.xz
           - https://downloads.openwrt.org/releases/21.02.3/targets/x86/64/openwrt-sdk-21.02.3-x86-64_gcc-8.4.0_musl.Linux-x86_64.tar.xz
-          - https://downloads.openwrt.org/releases/22.03.0-rc2/targets/x86/64/openwrt-sdk-22.03.0-rc2-x86-64_gcc-11.2.0_musl.Linux-x86_64.tar.xz
+          - https://downloads.openwrt.org/releases/22.03.0-rc5/targets/x86/64/openwrt-sdk-22.03.0-rc5-x86-64_gcc-11.2.0_musl.Linux-x86_64.tar.xz
 
     steps:
     - name: Checkout
