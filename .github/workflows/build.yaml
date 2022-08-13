@@ -8,7 +8,7 @@ on:
 
 env:
   RELEASE_URL: https://gist.githubusercontent.com/csrutil/a448f7d1e9d6f0b8487fabd45dfc759f/raw/26642dc5b5a35cc954e14c7cd5edea8f197dc30d/OpenWrt-NIC-Drivers-release.txt
-  KMOD_VERSION: 9.009.02x5.10.2
+  KMOD_VERSION: 9.009.02x5.11.4
   APT_URL: https://gist.githubusercontent.com/csrutil/6d83b7dd62b5652697fe22271fbee482/raw/5149abcc3ca3ee48f95978949db528d6bf765daa/depends-ubuntu-2004
 
 jobs:
@@ -21,7 +21,7 @@ jobs:
         sdk_url:
           - https://downloads.openwrt.org/releases/19.07.10/targets/x86/64/openwrt-sdk-19.07.10-x86-64_gcc-7.5.0_musl.Linux-x86_64.tar.xz
           - https://downloads.openwrt.org/releases/21.02.3/targets/x86/64/openwrt-sdk-21.02.3-x86-64_gcc-8.4.0_musl.Linux-x86_64.tar.xz
-          - https://downloads.openwrt.org/releases/22.03.0-rc5/targets/x86/64/openwrt-sdk-22.03.0-rc5-x86-64_gcc-11.2.0_musl.Linux-x86_64.tar.xz
+          - https://downloads.openwrt.org/releases/22.03.0-rc6/targets/x86/64/openwrt-sdk-22.03.0-rc6-x86-64_gcc-11.2.0_musl.Linux-x86_64.tar.xz
 
     steps:
     - name: Checkout
