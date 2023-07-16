@@ -1,76 +1,51 @@
 # OpenWrt NIC Drivers
 
-The repository is for building the Realtek 8125b & Intel IGB drivers for OpenWrt stock firmwares
+The repository is for building the Realtek 8125b driver for OpenWrt firmwares
 
-[![Build OpenWrt-NIC-Drivers](https://github.com/csrutil/OpenWrt-NIC-Drivers/actions/workflows/build.yaml/badge.svg)](https://github.com/csrutil/OpenWrt-NIC-Drivers/actions/workflows/build.yaml)
-
-## Receive Side Scaling (RSS)
-
-> When Receive Side Scaling (RSS) is enabled, all of the receive data processing for a particular TCP connection is shared across multiple processors or processor cores. Without RSS, all of the processing is performed by a single processor, resulting in inefficient system cache utilization.
-
-You can check how many queues that nic has by `ethtool -S eth0`.
-
-```bash
-# two queues here for nic eth0
-root@main:~# ethtool -S eth0 | grep queue_
-     tx_queue_0_packets: 76237812
-     tx_queue_0_bytes: 115366533619
-     tx_queue_0_restart: 0
-     tx_queue_1_packets: 13284570
-     tx_queue_1_bytes: 11170423616
-     tx_queue_1_restart: 0
-     rx_queue_0_packets: 45949999
-     rx_queue_0_bytes: 55390542647
-     rx_queue_0_drops: 0
-     rx_queue_0_csum_err: 0
-     rx_queue_0_alloc_failed: 0
-     rx_queue_1_packets: 44304833
-     rx_queue_1_bytes: 56510279008
-     rx_queue_1_drops: 0
-     rx_queue_1_csum_err: 0
-     rx_queue_1_alloc_failed: 0
-```
-
-You can check the `/proc/interrupts` file for RSS queues on intel i211 nic
-
-![i211 RSS](https://i.imgur.com/D5ivSP7.png)
-
+[![Build Realtek r8125 driver for OpenWrt](https://github.com/csrutil/realtek-r8125-openwrt/actions/workflows/r8125.yaml/badge.svg?branch=main)](https://github.com/csrutil/realtek-r8125-openwrt/actions/workflows/r8125.yaml)
 
 ## Realtek RTL8125 / RTL8125B(S)(G)
 
-> The RTL8125BG/RTL8125BGS supports Receive-Side Scaling (RSS) to hash incoming TCP connections and load-balance received data processing across multiple CPUs. RSS improves the number of transactions per second and number of connections per second, for increased network throughput.
-
-There is a builtin driver called r8169 that supprt rtl8125b on linux, and I suppose you can't enable the Receive side scaling (RSS) on it, rtl8125b can support 32 queues. This version just enable the RSS.
+The latest version of the driver has the RSS feature disabled by default, even if the compilation option is enabled, it will not take effect.
 
 ```
-ENABLE_RSS_SUPPORT = y
-ENABLE_MULTIPLE_TX_QUEUE = y
-CONFIG_ASPM = n
+root@main:~/misc# cat /proc/interrupts | grep 'CPU\|eth' | grep -v '0          0'
+           CPU0       CPU1
+ 27:  183637666          0   PCI-MSI 262144-edge      eth0-0
+ 43:          1  101037815   PCI-MSI 262160-edge      eth0-16
+ 45:   98181298          0   PCI-MSI 262162-edge      eth0-18
+ 48:          0          2   PCI-MSI 262165-edge      eth0-21
+ 59:  175493469          0   PCI-MSI 278528-edge      eth1-0
+ 75:          1   89978815   PCI-MSI 278544-edge      eth1-16
+ 77:   97193843          0   PCI-MSI 278546-edge      eth1-18
+ 80:          0          6   PCI-MSI 278549-edge      eth1-21
+
+root@main:~# cat /proc/net/r8125/eth0/driver_var  | grep EnableRss
+driver version 9.011.01-NAPI-RSS
+chipset_name   RTL8125B
+EnableRss 0x0
 ```
 
-## Intel NICs
+## Setup
 
-- I350-based adapters: 8 queues
-- 82575-based adapters: 4 queues
-- 82576-based and newer adapters: 8 queues
-- I210-based adapters: 4 queues
-- I211-based adapters: 2 queues
+Attention⚠️, the ipk files in this repository only support official firmware. If you are compiling your own firmware, please refer to the scripts in the action.
 
-If you have an OpenWrt on a VM(ESXI or PVE) that has I211 nics, just set two cores on it, and enable `RSS=2`. that's it!
+First, download the corresponding ipk file according to your version, scp it to your device, and then run
 
-```bash
-# set RSS to 2 on OpenWrt for two nics
-root@main:~# cat /etc/modules.d/35-igb-intel
-igb RSS=2,2
+```
+opkg -i kmod-r8125_4.14.275+9.011.01-x86-0_x86_64.ipk
 ```
 
-## How to use it
+If you are using the 5.15 kernel, the r8196 driver should automatically drive your network card. If you want to force the use of the driver from this project, you can delete the r8196 driver.
 
-Download package from https://github.com/csrutil/OpenWrt-NIC-Drivers/releases page, scp into your router and install it.
+## QA
 
-## Notice
+if you're not the right speed, please check this command.
 
-Those packages are ONLY for the official stock firmwares
+```
+# https://forum.openwrt.org/t/realtek-8156b-2-5g-for-pi-4-and-openwrt-21-02-2/125102/11
+ethtool -s eth1 autoneg on advertise 0x80000000002f
+```
 
 ## Donating 💸
 
