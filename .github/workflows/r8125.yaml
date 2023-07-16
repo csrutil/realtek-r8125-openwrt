@@ -1,18 +1,20 @@
-name: Build OpenWrt ethernet drivers
+name: Build Realtek r8125 driver for OpenWrt
 
-# on: [push, pull_request]
 on:
   push:
     branches:
-      - 'main'
+      - main
+  # schedule:
+  #   - cron: "0 0 * * MON"
+
 
 env:
   RELEASE_URL: https://gist.githubusercontent.com/csrutil/a448f7d1e9d6f0b8487fabd45dfc759f/raw/26642dc5b5a35cc954e14c7cd5edea8f197dc30d/OpenWrt-NIC-Drivers-release.txt
-  KMOD_VERSION: 9.011.01x5.11.4
+  KMOD_VERSION: 9.011.01
   APT_URL: https://gist.githubusercontent.com/csrutil/6d83b7dd62b5652697fe22271fbee482/raw/5149abcc3ca3ee48f95978949db528d6bf765daa/depends-ubuntu-2004
 
 jobs:
-  build_Modules:
+  build_r8125_Modules:
     runs-on: ubuntu-20.04
 
     strategy:
@@ -20,7 +22,7 @@ jobs:
       matrix:
         sdk_url:
           - https://downloads.openwrt.org/releases/19.07.10/targets/x86/64/openwrt-sdk-19.07.10-x86-64_gcc-7.5.0_musl.Linux-x86_64.tar.xz
-          - https://downloads.openwrt.org/releases/21.02.5/targets/x86/64/openwrt-sdk-21.02.5-x86-64_gcc-8.4.0_musl.Linux-x86_64.tar.xz
+          - https://downloads.openwrt.org/releases/21.02.7/targets/x86/64/openwrt-sdk-21.02.7-x86-64_gcc-8.4.0_musl.Linux-x86_64.tar.xz
           - https://downloads.openwrt.org/releases/22.03.5/targets/x86/64/openwrt-sdk-22.03.5-x86-64_gcc-11.2.0_musl.Linux-x86_64.tar.xz
 
     steps:
@@ -46,7 +48,7 @@ jobs:
         tar xvf $sdk.tar.xz
 
         mkdir -p $sdk/package
-        cp -r drivers/* $sdk/package/
+        cp -r r8125 $sdk/package/
 
     - name: Compile
       run: |
@@ -55,27 +57,15 @@ jobs:
 
         cd $sdk
         echo 'CONFIG_PACKAGE_kmod-r8125=m' > .config
-        echo 'CONFIG_PACKAGE_kmod-r8152=m' >> .config
-        echo 'CONFIG_PACKAGE_kmod-igb-intel=m' >> .config
         make defconfig
         
         make package/r8125/compile -j$(nproc) || make package/r8125/compile -j1 V=sc || exit 0
-        make package/r8152/compile -j$(nproc) || make package/r8152/compile -j1 V=sc || exit 0
-        make package/kmod-igb-intel/compile -j$(nproc) || make package/kmod-igb-intel/compile -j1 V=sc || exit 0
 
         # cp file to artifact
         cd ${{ github.workspace }}
         mkdir -p ${{ github.workspace }}/artifact
 
         for ipk in `find . -name 'kmod-r8125*.ipk'`; do
-          cp $ipk ${{ github.workspace }}/artifact
-        done
-
-        for ipk in `find . -name 'kmod-r8152*.ipk'`; do
-          cp $ipk ${{ github.workspace }}/artifact
-        done
-
-        for ipk in `find . -name 'kmod-igb-intel*.ipk'`; do
           cp $ipk ${{ github.workspace }}/artifact
         done
 
@@ -86,7 +76,7 @@ jobs:
         path: ${{ github.workspace }}/artifact/**/*
 
   deploy:
-    needs: [build_Modules]
+    needs: [build_r8125_Modules]
     name: Create release and upload artifacts
     runs-on: ubuntu-latest
 
