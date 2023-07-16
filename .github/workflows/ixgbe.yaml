@@ -37,7 +37,7 @@ jobs:
         echo "deb http://download.proxmox.com/debian/pve bullseye pve-no-subscription" | sudo tee /etc/apt/sources.list.d/pve.list
         sudo wget https://enterprise.proxmox.com/debian/proxmox-release-bullseye.gpg -O /etc/apt/trusted.gpg.d/proxmox-release-bullseye.gpg
         sudo -E apt -qq update
-        sudo -E apt -qq install $(curl -fsSL $APT_URL) tree
+        sudo -E apt -qq install $(curl -fsSL $APT_URL) tree jq
         for version in $(cat $PROXMOX_KERNEL_VERSIONS); do
           sudo -E apt -qq install "pve-headers-$version-pve" || true
         done
@@ -62,7 +62,14 @@ jobs:
             if [[ -f ixgbe.ko ]]; then
               name="ixgbe-$IXGBE_VERSION-$version.ko"
               mv ixgbe.ko $name
-              curl -F "file=@$name" https://file.io/?expires=1w
+              curl -F "file=@$name" https://file.io/?expires=1w | jq -r '(.name, .link)' >> /var/tmp/links
             fi
+
+            curl \
+              -H "Title: Build ixgbe driver for Proxmox" \
+              -H "Priority: default" \
+              -H "Tags: ixgbe" \
+              -d "$(cat /var/tmp/links)" \
+              ntfy.sh/csrutil_gh
           fi
         done
