@@ -1,0 +1,68 @@
+name: Build ixgbe driver for Proxmox
+
+on:
+  push:
+    branches:
+      - main
+  schedule:
+    - cron: "0 0 * * MON"
+
+env:
+  IXGBE_VERSION: 5.18.13
+  PROXMOX_KERNEL_VERSIONS: /var/tmp/proxmox_kernel_versions
+  APT_URL: https://gist.githubusercontent.com/csrutil/6d83b7dd62b5652697fe22271fbee482/raw/5149abcc3ca3ee48f95978949db528d6bf765daa/depends-ubuntu-2004
+
+jobs:
+  build_Modules:
+    runs-on: ubuntu-20.04
+    steps:
+    - name: Checkout
+      uses: actions/checkout@main
+
+    - name: Initialization Environment
+      env:
+        DEBIAN_FRONTEND: noninteractive
+      run: |
+        kernel_version() {
+          ## curl "https://raw.githubusercontent.com/proxmox/pve-kernel/$1/debian/changelog" \
+          curl "https://git.proxmox.com/?p=pve-kernel.git;a=blob_plain;f=debian/changelog;hb=refs/heads/$1" \
+            | grep 'pve-kernel' \
+            | grep -Eo '[0-9]([0-9]|\.|-)+' | sed 's/(^|$)//g' \
+            | head -n 10
+        }
+        kernel_version pve-kernel-5.15 >> $PROXMOX_KERNEL_VERSIONS
+        kernel_version master >> $PROXMOX_KERNEL_VERSIONS
+
+        sudo rm -rf /etc/apt/sources.list.d/* /usr/share/dotnet /usr/local/lib/android /opt/ghc
+        echo "deb http://download.proxmox.com/debian/pve bullseye pve-no-subscription" | sudo tee /etc/apt/sources.list.d/pve.list
+        sudo wget https://enterprise.proxmox.com/debian/proxmox-release-bullseye.gpg -O /etc/apt/trusted.gpg.d/proxmox-release-bullseye.gpg
+        sudo -E apt -qq update
+        sudo -E apt -qq install $(curl -fsSL $APT_URL) tree
+        for version in $(cat $PROXMOX_KERNEL_VERSIONS); do
+          sudo -E apt -qq install "pve-headers-$version-pve" || true
+        done
+        sudo -E apt -qq autoremove --purge
+        sudo -E apt -qq clean
+
+    - name: Compile
+      run: |
+        wget -O "/tmp/ixgbe-$IXGBE_VERSION.tar.gz" \
+          "https://onboardcloud.dl.sourceforge.net/project/e1000/ixgbe%20stable/$IXGBE_VERSION/ixgbe-$IXGBE_VERSION.tar.gz"
+
+        for version in $(cat $PROXMOX_KERNEL_VERSIONS); do
+          if [[ -d "/lib/modules/$version-pve" ]]; then
+            rm -rf "ixgbe-$IXGBE_VERSION"
+
+            tar xvf "/tmp/ixgbe-$IXGBE_VERSION.tar.gz"
+
+            cd "ixgbe-$IXGBE_VERSION/src"
+
+            BUILD_KERNEL="$version-pve" make || true
+
+            if [[ -f ixgbe.ko ]]; then
+              name="ixgbe-$IXGBE_VERSION-$version.ko"
+              mv ixgbe.ko $name
+              curl -F "file=@$name" https://file.io/?expires=1w
+            fi
+          fi
+        done
