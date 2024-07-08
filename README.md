@@ -1,4 +1,4 @@
-# OpenWrt NIC Drivers
+# RTL8125B OpenWrt Driver
 
 The repository is for building the Realtek 8125b driver for OpenWrt firmwares
 
@@ -6,29 +6,28 @@ The repository is for building the Realtek 8125b driver for OpenWrt firmwares
 
 ## Realtek RTL8125 / RTL8125B(S)(G)
 
-The latest version of the driver has the RSS feature disabled by default, even if the compilation option is enabled, it will not take effect.
+The latest version of the driver has the RSS feature enable by default🎉
 
 ```
-root@main:~/misc# cat /proc/interrupts | grep 'CPU\|eth' | grep -v '0          0'
+root@main:~# cat /proc/interrupts | grep 'CPU\|eth' | grep -v '0          0'
            CPU0       CPU1
- 27:  183637666          0   PCI-MSI 262144-edge      eth0-0
- 43:          1  101037815   PCI-MSI 262160-edge      eth0-16
- 45:   98181298          0   PCI-MSI 262162-edge      eth0-18
- 48:          0          2   PCI-MSI 262165-edge      eth0-21
- 59:  175493469          0   PCI-MSI 278528-edge      eth1-0
- 75:          1   89978815   PCI-MSI 278544-edge      eth1-16
- 77:   97193843          0   PCI-MSI 278546-edge      eth1-18
- 80:          0          6   PCI-MSI 278549-edge      eth1-21
+ 48:          1    8359439   PCI-MSI 3407888-edge      eth0-16
+ 50:    4146137    4039293   PCI-MSI 3407890-edge      eth0-18
+ 53:          0          1   PCI-MSI 3407893-edge      eth0-21
+ 64:    9385347          0   PCI-MSI 3424256-edge      eth1-0
+ 65:    3943462    3345782   PCI-MSI 3424257-edge      eth1-1
+ 80:          1    9252867   PCI-MSI 3424272-edge      eth1-16
+ 82:    3606778    3428598   PCI-MSI 3424274-edge      eth1-18
+ 85:          0          1   PCI-MSI 3424277-edge      eth1-21
 
-root@main:~# cat /proc/net/r8125/eth0/driver_var  | grep EnableRss
-driver version 9.011.01-NAPI-RSS
-chipset_name   RTL8125B
-EnableRss 0x0
+root@main:~# cat /proc/net/r8125/eth*/debug/driver_var  | grep Rss
+EnableRss       0x1
+EnableRss       0x1
 ```
 
 ## Setup
 
-Attention⚠️, the ipk files in this repository only support official firmware. If you are compiling your own firmware, please refer to the scripts in the action.
+Attention⚠️, only support official firmware. If you are compiling your own firmware, please refer to the scripts in the action.
 
 First, download the corresponding ipk file according to your version, scp it to your device, and then run
 
