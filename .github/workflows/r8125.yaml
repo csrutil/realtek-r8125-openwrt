@@ -59,7 +59,7 @@ jobs:
     - name: Compile
       run: |
         url=${{ matrix.sdk_url }}
-        sdk=$(basename $url | awk -F '.tar.xz' '{ print $1 }')
+        sdk=$(basename $url | sed -E 's/\.tar\.(xz|zst)$//')
 
         cd $sdk
         echo 'CONFIG_PACKAGE_kmod-r8125=m' > .config
