@@ -44,10 +44,14 @@ jobs:
     - name: Download SDK
       run: |
         url=${{ matrix.sdk_url }}
-        sdk=$(basename $url | awk -F '.tar.xz' '{ print $1 }')
+        sdk=$(basename $url | sed -E 's/\.tar\.(xz|zst)$//')
 
         wget $url
-        tar xvf $sdk.tar.xz
+        if [[ $url == *.tar.xz ]]; then
+            tar xvf $sdk.tar.xz
+        else
+            tar --zstd -xvf $sdk.tar.zst
+        fi
 
         mkdir -p $sdk/package
         cp -r r8125 $sdk/package/
