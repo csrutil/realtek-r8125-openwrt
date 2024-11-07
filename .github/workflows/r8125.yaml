@@ -80,6 +80,7 @@ jobs:
       with:
         name: ${{ env.KMOD_VERSION }}
         path: ${{ github.workspace }}/artifact/**/*
+        overwrite: true
 
   deploy:
     needs: [build_r8125_Modules]
