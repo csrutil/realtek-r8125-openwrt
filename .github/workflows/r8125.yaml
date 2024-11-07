@@ -88,7 +88,7 @@ jobs:
 
     steps:
     - name: Download build artifacts
-      uses: actions/download-artifact@v2
+      uses: actions/download-artifact@v4
       with:
         name: ${{ env.KMOD_VERSION }}
 
