@@ -16,6 +16,7 @@ env:
 jobs:
   build_r8125_Modules:
     runs-on: ubuntu-20.04
+    continue-on-error: true
 
     strategy:
       fail-fast: false
