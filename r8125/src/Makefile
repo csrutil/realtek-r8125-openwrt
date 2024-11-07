@@ -31,6 +31,7 @@
 ################################################################################
 
 CONFIG_SOC_LAN = n
+ENABLE_FIBER_SUPPORT = n
 ENABLE_REALWOW_SUPPORT = n
 ENABLE_DASH_SUPPORT = n
 ENABLE_DASH_PRINTER_SUPPORT = n
@@ -58,6 +59,10 @@ ifneq ($(KERNELRELEASE),)
 	r8125-objs := r8125_n.o rtl_eeprom.o rtltool.o
 	ifeq ($(CONFIG_SOC_LAN), y)
 		EXTRA_CFLAGS += -DCONFIG_SOC_LAN
+	endif
+	ifeq ($(ENABLE_FIBER_SUPPORT), y)
+		r8125-objs += r8125_fiber.o
+		EXTRA_CFLAGS += -DENABLE_FIBER_SUPPORT
 	endif
 	ifeq ($(ENABLE_REALWOW_SUPPORT), y)
 		r8125-objs += r8125_realwow.o
