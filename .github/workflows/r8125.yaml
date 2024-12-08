@@ -7,14 +7,13 @@ on:
   # schedule:
   #   - cron: "0 0 * * MON"
 
-
 env:
   RELEASE_URL: https://gist.githubusercontent.com/csrutil/a448f7d1e9d6f0b8487fabd45dfc759f/raw/26642dc5b5a35cc954e14c7cd5edea8f197dc30d/OpenWrt-NIC-Drivers-release.txt
   KMOD_VERSION: 9.014.01
   APT_URL: https://gist.githubusercontent.com/csrutil/6d83b7dd62b5652697fe22271fbee482/raw/5149abcc3ca3ee48f95978949db528d6bf765daa/depends-ubuntu-2004
 
 jobs:
-  build_r8125_Modules:
+  build_r8125_modules:
     runs-on: ubuntu-20.04
     continue-on-error: true
 
@@ -29,104 +28,113 @@ jobs:
           - https://downloads.openwrt.org/releases/24.10.0-rc2/targets/x86/64/openwrt-sdk-24.10.0-rc2-x86-64_gcc-13.3.0_musl.Linux-x86_64.tar.zst
 
     steps:
-    - name: Checkout
-      uses: actions/checkout@main
+    - name: Checkout repository
+      uses: actions/checkout@v3
 
-    - name: Initialization Environment
+    - name: Initialize Environment
       env:
         DEBIAN_FRONTEND: noninteractive
       run: |
         sudo rm -rf /etc/apt/sources.list.d/* /usr/share/dotnet /usr/local/lib/android /opt/ghc
-        sudo -E apt-get -qq update
-        sudo -E apt-get -qq install $(curl -fsSL $APT_URL) tree jq
-        sudo -E apt-get -qq autoremove --purge
-        sudo -E apt-get -qq clean
+        sudo apt-get update -qq
+        sudo apt-get install -qq -y $(curl -fsSL $APT_URL) tree jq
+        sudo apt-get autoremove --purge -qq
+        sudo apt-get clean -qq
 
-    - name: Download SDK
+    - name: Download and Extract SDK
       run: |
-        url=${{ matrix.sdk_url }}
-        sdk=$(basename $url | sed -E 's/\.tar\.(xz|zst)$//')
-
-        wget $url
-        if [[ $url == *.tar.xz ]]; then
-            tar xvf $sdk.tar.xz
-        else
-            tar --zstd -xvf $sdk.tar.zst
-        fi
-
+        sdk=$(basename ${{ matrix.sdk_url }} | sed -E 's/\.tar\.(xz|zst)$//')
+        wget ${{ matrix.sdk_url }}
+        case ${{ matrix.sdk_url }} in
+          *.tar.xz) tar -xvf $sdk.tar.xz ;;
+          *.tar.zst) tar --zstd -xvf $sdk.tar.zst ;;
+        esac
         mkdir -p $sdk/package
         cp -r r8125 $sdk/package/
 
-    - name: Compile
+    - name: Compile Driver
       run: |
-        url=${{ matrix.sdk_url }}
-        sdk=$(basename $url | sed -E 's/\.tar\.(xz|zst)$//')
-
+        sdk=$(basename ${{ matrix.sdk_url }} | sed -E 's/\.tar\.(xz|zst)$//')
         cd $sdk
         echo 'CONFIG_PACKAGE_kmod-r8125=m' > .config
         make defconfig
-        
-        make package/r8125/compile -j$(nproc) || make package/r8125/compile -j1 V=sc || exit 0
 
-        # cp file to artifact
+        if ! make package/r8125/compile -j$(nproc); then
+          make package/r8125/compile -j1 V=sc || echo "Compilation failed for ${{ matrix.sdk_url }}!"
+        fi
+
         cd ${{ github.workspace }}
-        mkdir -p ${{ github.workspace }}/artifact
+        mkdir -p artifact
+        find . -name 'kmod-r8125*.ipk' -exec mv {} artifact/ \;
 
-        for ipk in `find . -name 'kmod-r8125*.ipk'`; do
-          curl -F "file=@$ipk" https://file.io | jq
-          cp $ipk ${{ github.workspace }}/artifact
-        done
+    - name: Upload Build Artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: kmod-r8125-${{ matrix.sdk_url }}
+        path: ${{ github.workspace }}/artifact/**/*
+        if-no-files-found: error
 
-    - name: Upload build artifacts
-      uses: actions/upload-artifact@v4
+  collect_and_upload:
+    needs: build_r8125_modules
+    runs-on: ubuntu-latest
+    steps:
+    - name: Download Artifacts
+      uses: actions/download-artifact@v3
+      with:
+        path: all_artifacts
+
+    - name: Merge All Artifacts
+      run: |
+        mkdir -p combined_artifact
+        find all_artifacts -name '*.ipk' -exec mv {} combined_artifact/ \;
+        cd combined_artifact && md5sum *.ipk > md5sum.txt
+
+    - name: Upload Combined Artifact
+      uses: actions/upload-artifact@v3
       with:
         name: ${{ env.KMOD_VERSION }}
-        path: ${{ github.workspace }}/artifact/**/*
-        overwrite: true
+        path: combined_artifact/**/*
 
   deploy:
-    needs: [build_r8125_Modules]
-    name: Create release and upload artifacts
+    needs: collect_and_upload
+    name: Create Release and Upload Artifacts
     runs-on: ubuntu-latest
 
     steps:
-    - name: Download build artifacts
-      uses: actions/download-artifact@v4
+    - name: Download Combined Artifact
+      uses: actions/download-artifact@v3
       with:
         name: ${{ env.KMOD_VERSION }}
 
-    - name: Upload build artifacts to cloud
+    - name: Prepare Release
       run: |
-        mkdir -p ${{ github.workspace }}/artifact
-        for ipk in `find . -name '*.ipk'`; do
-          mv $ipk ${{ github.workspace }}/artifact
-        done
+        mkdir -p artifact
+        mv *.ipk artifact/
         cd artifact && md5sum *.ipk > md5sum.txt
-        cd ..
 
         wget -O release.txt $RELEASE_URL
         echo -e "\nUpdated at $(date)" >> release.txt
 
-    - name: Upload firmware to release
-      uses: softprops/action-gh-release@v2
-      env:
-        GITHUB_TOKEN: ${{ secrets.ACTION_GITHUB_TOKEN }}
+    - name: Upload to GitHub Release
+      uses: softprops/action-gh-release@v1
       with:
         name: ${{ env.KMOD_VERSION }}
         tag_name: ${{ env.KMOD_VERSION }}
         body_path: release.txt
         files: artifact/**/*
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-    - name: Remove old Releases
-      uses: dev-drprasad/delete-older-releases@v0.2.0
+    - name: Cleanup Old Releases
+      uses: dev-drprasad/delete-older-releases@v0.3.1
       with:
         keep_latest: 2
         delete_tags: true
-        delete_tag_pattern: ${{ env.KMOD_VERSION }}
       env:
-        GITHUB_TOKEN: ${{ secrets.ACTION_GITHUB_TOKEN }}
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-    - name: Delete Artifacts
-      uses: geekyeggo/delete-artifact@v1
+    - name: Delete Build Artifacts
+      uses: geekyeggo/delete-artifact@v2
       with:
         name: ${{ env.KMOD_VERSION }}
+
