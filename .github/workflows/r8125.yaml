@@ -55,10 +55,10 @@ jobs:
     - name: Compile Driver
       run: |
         sdk=$(basename ${{ matrix.sdk_url }} | sed -E 's/\.tar\.(xz|zst)$//')
+
         cd $sdk
         echo 'CONFIG_PACKAGE_kmod-r8125=m' > .config
         make defconfig
-
         if ! make package/r8125/compile -j$(nproc); then
           make package/r8125/compile -j1 V=sc || echo "Compilation failed for ${{ matrix.sdk_url }}!"
         fi
@@ -67,10 +67,12 @@ jobs:
         mkdir -p artifact
         find . -name 'kmod-r8125*.ipk' -exec mv {} artifact/ \;
 
+        echo "SDK=$sdk" >> $GITHUB_ENV
+
     - name: Upload Build Artifacts
       uses: actions/upload-artifact@v3
       with:
-        name: kmod-r8125-${{ matrix.sdk_url }}
+        name: kmod-r8125-${{ env.SDK }}
         path: ${{ github.workspace }}/artifact/**/*
         if-no-files-found: error
 
@@ -81,7 +83,9 @@ jobs:
     - name: Download Artifacts
       uses: actions/download-artifact@v3
       with:
-        path: all_artifacts
+        path: combined_artifact
+        pattern: kmod-r8125-*
+        merge-multiple: true
 
     - name: Merge All Artifacts
       run: |
