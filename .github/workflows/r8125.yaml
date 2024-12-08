@@ -112,12 +112,12 @@ jobs:
 
     - name: Prepare Release
       run: |
+        wget -O release.txt $RELEASE_URL
+        echo -e "\nUpdated at $(date)" >> release.txt
+
         mkdir -p artifact
         mv *.ipk artifact/
         cd artifact && md5sum *.ipk > md5sum.txt
-
-        wget -O release.txt $RELEASE_URL
-        echo -e "\nUpdated at $(date)" >> release.txt
 
     - name: Upload to GitHub Release
       uses: softprops/action-gh-release@v1
@@ -140,5 +140,6 @@ jobs:
     - name: Delete Build Artifacts
       uses: geekyeggo/delete-artifact@v2
       with:
-        name: ${{ env.KMOD_VERSION }}
-
+        name: |
+          kmod-r8125-*
+          ${{ env.KMOD_VERSION }}
