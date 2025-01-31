@@ -71,7 +71,7 @@ jobs:
         echo "SDK=$sdk" >> $GITHUB_ENV
 
     - name: Upload Build Artifacts
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: kmod-r8125-${{ env.SDK }}
         path: ${{ github.workspace }}/artifact/**/*
@@ -82,7 +82,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Download Artifacts
-      uses: actions/download-artifact@v3
+      uses: actions/download-artifact@v4
       with:
         path: all_artifacts
         pattern: kmod-r8125-*
@@ -95,7 +95,7 @@ jobs:
         cd combined_artifact && md5sum *.ipk > md5sum.txt
 
     - name: Upload Combined Artifact
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: ${{ env.KMOD_VERSION }}
         path: combined_artifact/**/*
@@ -107,7 +107,7 @@ jobs:
 
     steps:
     - name: Download Combined Artifact
-      uses: actions/download-artifact@v3
+      uses: actions/download-artifact@v4
       with:
         name: ${{ env.KMOD_VERSION }}
 
