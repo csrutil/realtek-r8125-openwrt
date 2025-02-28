@@ -53,6 +53,7 @@ DISABLE_MULTI_MSIX_VECTOR = n
 ENABLE_DOUBLE_VLAN = n
 ENABLE_PAGE_REUSE = n
 ENABLE_RX_PACKET_FRAGMENT = n
+ENABLE_GIGA_LITE = y
 
 ifneq ($(KERNELRELEASE),)
 	obj-m := r8125.o
@@ -135,6 +136,9 @@ ifneq ($(KERNELRELEASE),)
 	endif
 	ifeq ($(ENABLE_RX_PACKET_FRAGMENT), y)
 		EXTRA_CFLAGS += -DENABLE_RX_PACKET_FRAGMENT
+	endif
+	ifeq ($(ENABLE_GIGA_LITE), y)
+		EXTRA_CFLAGS += -DENABLE_GIGA_LITE
 	endif
 else
 	BASEDIR := /lib/modules/$(shell uname -r)
